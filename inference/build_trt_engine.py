@@ -5,7 +5,7 @@ import tensorrt as trt
 def build_engine(
     onnx_path: str = "onnx/model.onnx",
     engine_path: str = "trt/model.plan",
-    max_batch_size: int = 1,
+    workspace_size: int = 1 << 30,  # 1GB
     fp16: bool = True,
 ):
     """
@@ -13,9 +13,9 @@ def build_engine(
 
     Args:
         onnx_path: Path to the ONNX model
-        engine_path: Where to save the TensorRT engine
-        max_batch_size: Maximum batch size
-        fp16: Whether to enable FP16 precision
+        engine_path: Output path for the TensorRT engine
+        workspace_size: GPU workspace size in bytes
+        fp16: Enable FP16 precision
     """
     # Ensure output directory exists
     os.makedirs(os.path.dirname(engine_path), exist_ok=True)
@@ -37,7 +37,8 @@ def build_engine(
 
     # Configure builder settings
     config = builder.create_builder_config()
-    config.max_workspace_size = 1 << 30  # 1GB
+    # Use the new memory pool API for workspace
+    config.set_memory_pool(trt.MemoryPoolType.WORKSPACE, workspace_size)
     if fp16:
         config.set_flag(trt.BuilderFlag.FP16)
 
