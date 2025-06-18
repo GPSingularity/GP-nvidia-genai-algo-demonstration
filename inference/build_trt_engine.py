@@ -37,8 +37,8 @@ def build_engine(
 
     # Configure builder settings
     config = builder.create_builder_config()
-    # Use the new memory pool API for workspace
-    config.set_memory_pool(trt.MemoryPoolType.WORKSPACE, workspace_size)
+    # Set workspace size limit
+    config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, workspace_size)
     if fp16:
         config.set_flag(trt.BuilderFlag.FP16)
 
