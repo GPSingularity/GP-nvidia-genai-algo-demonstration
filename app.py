@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import faiss
 import pickle
@@ -33,21 +32,24 @@ embedder = SentenceTransformer(EMBED_MODEL, device=device)
 llm = NeMoLLM()
 
 # RAG inference function
-def rag_answer(query: str, top_k: int = 5, max_length: int = 256):
-    # Embed the query
-    q_emb = embedder.encode([query]).astype("float32")
-    # Retrieve top_k chunks
-    distances, indices = index.search(q_emb, top_k)
-    retrieved = [chunks[i]["text"] for i in indices[0]]
-    # Build context and prompt
-    context = "\n\n---\n\n".join(retrieved)
-    prompt = (
-        "Answer the question based on the following context:\n"
-        f"{context}\n\nQ: {query}\nA:"
-    )
-    # Generate response
-    response = llm.generate([prompt], max_length=max_length)[0]
-    return response, retrieved
+def rag_answer(query: str, top_k: int = 5, max_new_tokens: int = 128):
+    try:
+        # Embed the query
+        q_emb = embedder.encode([query]).astype("float32")
+        # Retrieve top_k chunks
+        _, indices = index.search(q_emb, top_k)
+        retrieved = [chunks[i]["text"] for i in indices[0]]
+        # Build context and prompt
+        context = "\n\n---\n\n".join(retrieved)
+        prompt = (
+            "Answer the question based on the following context:\n"
+            f"{context}\n\nQ: {query}\nA:"
+        )
+        # Generate response
+        response = llm.generate([prompt], max_new_tokens=max_new_tokens)[0]
+        return response, retrieved
+    except Exception as e:
+        return str(e), []
 
 # Build the Gradio interface
 with gr.Blocks() as demo:
@@ -59,5 +61,5 @@ with gr.Blocks() as demo:
     btn = gr.Button("Ask")
     btn.click(fn=rag_answer, inputs=[inp], outputs=[out, src])
 
-# Launch with host and port for container/VM
+# Launch with host and port for container/VM with sharing enabled
 demo.launch(server_name="0.0.0.0", server_port=7860, share=True)
