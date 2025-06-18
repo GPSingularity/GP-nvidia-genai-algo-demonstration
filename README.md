@@ -49,7 +49,7 @@ The demo leverages the following NVIDIA AI stack:
 
 ### Hardware Acquisition
 
-| Component                  | Notes                                       |
+| Component                  | Note                                       |
 | -------------------------- | ------------------------------------------- |
 | NVIDIA A100 80 GB SXM4     | Still greater inference   |
 | Server chassis / CPU / RAM | Dual-socket CPU, 512 GB+ DDR4, NVMe storage |
@@ -62,7 +62,7 @@ This demo prefers the latest **Blackwell B200** GPUs on NVIDIA Lepton AI where a
 
 | Provider           | Instance Type    | GPU Config             |
 | ----------------   | ---------------- | ---------------------- |
-| NVIDIA Lepton AI   | GPU Cloud B200   | 1 × B200 (Blackwell\*) |
+| NVIDIA Lepton AI   | GPU Cloud B200   | 1 × Blackwell B200     |
 | NVIDIA DGX Cloud   | DGX A100 service | Multi × A100 nodes     |
 | AWS                | 24xlarge         | 8 × A100‑80GB          |
 | Google Cloud       | A2 MegaGPU       | 16 × A100‑80GB         |
