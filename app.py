@@ -1,3 +1,12 @@
+# macOS fork safety: use spawn to prevent segfaults
+import multiprocessing as mp
+mp.set_start_method('spawn', force=True)
+
+# Disable Objective-C fork safety on macOS (for libraries that fork)
+import os
+os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
+
+
 import faiss
 import pickle
 from retriever.chunker import load_and_chunk  # if you want dynamic ingestion
@@ -20,8 +29,8 @@ with open(META_PATH, "rb") as f:
 # Embedding model (for queries)
 embedder = SentenceTransformer(EMBED_MODEL)
 
-# NeMo LLM
-nemo_llm = NeMoLLM(model_name="gpt-j-6B")
+# NeMo LLM (uses default 'megatron_gpt_345m')
+nemo_llm = NeMoLLM()
 
 # RAG function
 
