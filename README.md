@@ -37,7 +37,7 @@ This repository demonstrates a full-stack Retrieval-Augmented Generation (RAG) p
 
 ## AI Infrastructure
 
-Our demo leverages the following NVIDIA AI stack:
+The demo leverages the following NVIDIA AI stack:
 
 - **Local Development**: Python 3 venv on macOS or Linux for chunking, embedding, and Gradio UI.
 - **Vector Search**: FAISS running on CPU for efficient retrieval of document embeddings.
@@ -47,31 +47,31 @@ Our demo leverages the following NVIDIA AI stack:
   - **TensorRT Engine**: Optimized engine built on NVIDIA A100 GPU (SXM4 or PCIe) using HBM2e memory (>2 TB/s bandwidth).
   - **Inference Server**: Triton Inference Server Docker container (`nvcr.io/nvidia/tritonserver:24.03-py3`) to host the TensorRT engine with HTTP/gRPC endpoints.
 
-### Hardware Acquisition (On-Premises or Co-Loc)
+### Hardware Acquisition
 
 | Component                  | Notes                                       |
 | -------------------------- | ------------------------------------------- |
-| NVIDIA A100 80 GB SXM4     | Typical list; discounts for volume orders   |
+| NVIDIA A100 80 GB SXM4     | Still greater inference   |
 | Server chassis / CPU / RAM | Dual-socket CPU, 512 GB+ DDR4, NVMe storage |
 | Networking & Switches      | 100 GbE or InfiniBand to feed GPUs          |
 | Power & Cooling Upgrade    | Rack-power capacity, PDUs, CRAC adjustments |
 
-### Cloud-Hosted GPU Instances (OPEX)
+### Cloud-Hosted GPU Instances 
 
-This demo prefers **Blackwell B200** GPUs on NVIDIA Lepton AI where available. NVIDIA DGX Cloud uses A100 GPUs; other cloud providers offer A100 as fallback.
+This demo prefers the latest **Blackwell B200** GPUs on NVIDIA Lepton AI where available. NVIDIA DGX Cloud uses A100 GPUs. Hyperscales offer A100 as fallback.
 
-| Provider         | Instance Type    | GPU Config             |
-| ---------------- | ---------------- | ---------------------- |
-| NVIDIA Lepton AI | GPU Cloud B200   | 1 × B200 (Blackwell\*) |
-| NVIDIA DGX Cloud | DGX A100 service | Multi × A100 nodes     |
-| AWS              | p4d.24xlarge     | 8 × A100‑80GB          |
-| Google Cloud     | A2 MegaGPU       | 16 × A100‑80GB         |
-| Azure            | ND A100 v4       | 8 × A100‑80GB          |
-| Oracle Cloud     | BM.GPU4.8        | 8 × A100‑80GB          |
+| Provider           | Instance Type    | GPU Config             |
+| ----------------   | ---------------- | ---------------------- |
+| NVIDIA Lepton AI   | GPU Cloud B200   | 1 × B200 (Blackwell\*) |
+| NVIDIA DGX Cloud   | DGX A100 service | Multi × A100 nodes     |
+| AWS                | 24xlarge         | 8 × A100‑80GB          |
+| Google Cloud       | A2 MegaGPU       | 16 × A100‑80GB         |
+| Azure              | ND A100          | 8 × A100‑80GB          |
+| Oracle Cloud Infra | BM.GPU           | 8 × A100‑80GB          |
 
 ## Benchmarking Performance on NVIDIA GPU A100
 
-We ran our RAG pipeline on an NVIDIA A100 and measured end-to-end latency:
+I ran RAG pipeline on an NVIDIA GPU A100 and measured performance benchmarks for latency:
 
 | Question                                                          | Latency (ms) |
 | ----------------------------------------------------------------- | ------------ |
