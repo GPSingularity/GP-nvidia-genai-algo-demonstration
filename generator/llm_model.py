@@ -1,4 +1,5 @@
 import torch
+from pytorch_lightning import Trainer
 from nemo.collections.nlp.models.language_modeling.megatron_gpt_model import MegatronGPTModel
 from typing import List, Optional
 
@@ -6,8 +7,8 @@ class NeMoLLM:
     """
     Wrapper for an NVIDIA NeMo Megatron GPT model for text generation.
 
-    Defaults to a small NeMo checkpoint ("megatron_gpt_345m").
-    Use MegatronGPTModel.list_available_models() to see other options.
+    Uses a minimal PyTorch-Lightning Trainer to satisfy Megatron requirements.
+    Defaults to the small "megatron_gpt_345m" checkpoint.
     """
     def __init__(
         self,
@@ -17,15 +18,30 @@ class NeMoLLM:
         # Select device
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
-        # Load pretrained Megatron GPT model
+        # Build minimal Lightning Trainer for inference
+        trainer = Trainer(
+            logger=False,
+            enable_checkpointing=False,
+            enable_model_summary=False,
+            max_epochs=1,
+            enable_progress_bar=False,
+        )
+
+        # Load pretrained Megatron GPT model with trainer
         try:
-            self.model: MegatronGPTModel = MegatronGPTModel.from_pretrained(model_name)
+            self.model: MegatronGPTModel = MegatronGPTModel.from_pretrained(
+                pretrained_model_name=model_name,
+                trainer=trainer,
+            )
         except FileNotFoundError:
             available = MegatronGPTModel.list_available_models()
             raise FileNotFoundError(
                 f"Model '{model_name}' not found. Available: {available}"
             )
-        self.model.eval().to(self.device)
+
+        # Switch to eval mode and move to device
+        self.model.eval()
+        self.model.to(self.device)
 
     def generate(
         self,
@@ -39,18 +55,19 @@ class NeMoLLM:
         Generate text for each prompt.
         Returns a list of generated strings.
         """
-        return self.model.generate(
+        outputs = self.model.generate(
             input_prompts=prompts,
             max_length=max_length,
             temperature=temperature,
             top_k=top_k,
             top_p=top_p,
         )
+        return outputs
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(
-        description="NeMo Megatron GPT generation demo"
+        description="NeMo Megatron GPT inference demo with PyTorch-Lightning Trainer"
     )
     parser.add_argument(
         "--prompt", type=str, required=True, help="Input prompt for generation"
