@@ -6,7 +6,7 @@ from torch import nn
 def export_to_onnx(
     model_name: str = "distilgpt2",
     output_path: str = "onnx/model.onnx",
-    opset: int = 13,
+    opset: int = 14,
 ):
     """
     Export a Hugging Face causal LM to ONNX format, wrapping to bypass past_key_values.
@@ -14,7 +14,7 @@ def export_to_onnx(
     Args:
         model_name: HF model identifier
         output_path: path to save ONNX
-        opset: ONNX opset version
+        opset: ONNX opset version (>=14 to support triu)
     """
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -34,14 +34,12 @@ def export_to_onnx(
             self.model = model
 
         def forward(self, input_ids, attention_mask):
-            # Forward pass with no caching, returns tuple (logits, ...) when return_dict=False
             outputs = self.model(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
                 use_cache=False,
                 return_dict=False,
             )
-            # outputs[0] are logits
             return outputs[0]
 
     wrapper = GPT2Wrapper(model)
