@@ -37,19 +37,24 @@ def build_engine(
 
     # Configure builder settings
     config = builder.create_builder_config()
-    # Set workspace size limit
     config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, workspace_size)
     if fp16:
         config.set_flag(trt.BuilderFlag.FP16)
 
-    # Build the engine
-    engine = builder.build_engine(network, config)
-    if engine is None:
-        raise RuntimeError("Failed to build the TensorRT engine.")
+    # Build serialized network (TensorRT 8+)
+    engine_bytes = builder.build_serialized_network(network, config)
+    if engine_bytes is None:
+        raise RuntimeError("Failed to serialize the TensorRT engine.")
 
-    # Serialize and save
+    # Deserialize engine
+    runtime = trt.Runtime(TRT_LOGGER)
+    engine = runtime.deserialize_cuda_engine(engine_bytes)
+    if engine is None:
+        raise RuntimeError("Failed to deserialize the TensorRT engine.")
+
+    # Save engine bytes
     with open(engine_path, "wb") as f:
-        f.write(engine.serialize())
+        f.write(engine_bytes)
     print(f"TensorRT engine saved to {engine_path}")
 
 
