@@ -60,4 +60,4 @@ with gr.Blocks() as demo:
     btn.click(fn=rag_answer, inputs=[inp], outputs=[out, src])
 
 # Launch with host and port for container/VM
-demo.launch(server_name="0.0.0.0", server_port=7860)
+demo.launch(server_name="0.0.0.0", server_port=7860, share=True)
