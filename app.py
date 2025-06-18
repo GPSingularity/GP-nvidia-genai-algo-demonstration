@@ -53,16 +53,17 @@ def rag_answer(query: str, top_k: int = 5, max_new_tokens: int = 128):
 
 # Build the Gradio interface
 with gr.Blocks() as demo:
-gr.Markdown(
-    """
-    <div style="text-align: center; margin-bottom: 1em;">
-      <span style="font-size: 2.5em; color: #c00; font-weight: bold;">
-        GP’s NVIDIA RAG Demo on GPU A100 (CUDA)
-      </span>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+    gr.Markdown(
+        """
+        <div style="text-align: center; margin-bottom: 1em;">
+          <span style="font-size: 2.5em; color: #c00; font-weight: bold;">
+            GP’s NVIDIA RAG Demo on GPU A100 (CUDA)
+          </span>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
     with gr.Row():
         inp = gr.Textbox(lines=2, placeholder="Enter your question here...", label="Question")
     out = gr.Textbox(lines=5, label="Answer")
