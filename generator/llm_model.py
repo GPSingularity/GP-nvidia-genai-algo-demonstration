@@ -4,16 +4,18 @@ from typing import List
 
 class NeMoLLM:
     """
-    Fallback generator using Hugging Face AutoModel and AutoTokenizer for inference.
-    CPU only. Avoids Gradio/pipeline multiprocessing that can segfault on macOS.
+    GPU-accelerated generator using Hugging Face AutoModel and AutoTokenizer.
+    Uses CUDA if available (A100) for inference.
     """
-    def __init__(self, model_name: str = "distilgpt2", device: str = None):
-        # Select device (CPU or GPU if available)
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+    def __init__(self, model_name: str = "distilgpt2"):  
+        # Select device (GPU if available)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         # Load tokenizer and model
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(model_name)
-        self.model.to(self.device)
+        # Ensure tokenizer has a pad token
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.model = AutoModelForCausalLM.from_pretrained(model_name).to(self.device)
         self.model.eval()
 
     def generate(
@@ -25,13 +27,19 @@ class NeMoLLM:
         top_p: float = 0.9,
     ) -> List[str]:
         """
-        Generate text for a batch of prompts.
+        Generate text for a batch of prompts on GPU or CPU.
         Returns a list of generated strings.
         """
-        # Tokenize inputs
-        inputs = self.tokenizer(prompts, return_tensors="pt", padding=True)
+        # Tokenize inputs with padding
+        inputs = self.tokenizer(
+            prompts,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            pad_to_multiple_of=None
+        )
         input_ids = inputs["input_ids"].to(self.device)
-        attention_mask = inputs.get("attention_mask", None)
+        attention_mask = inputs.get("attention_mask")
         if attention_mask is not None:
             attention_mask = attention_mask.to(self.device)
 
@@ -45,6 +53,7 @@ class NeMoLLM:
                 top_k=top_k,
                 top_p=top_p,
                 do_sample=True,
+                pad_token_id=self.tokenizer.pad_token_id
             )
         # Decode outputs
         return self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
