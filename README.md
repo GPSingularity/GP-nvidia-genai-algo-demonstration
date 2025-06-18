@@ -32,9 +32,6 @@ flowchart LR
     I --> J["Triton Server"]
   end
 
-<!-- blank line 1 above -->
-<!-- blank line 2 above -->
-
 
 ## Quickstart
 
