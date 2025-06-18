@@ -1,4 +1,4 @@
-# GP-nvidia-genai-algo-demonstration
+# GP's NVIDIA GPT-Gen AI Algorithms Demonstration
 
 Building Complete RAG + NVIDIA PDFs with NeMo, ONNX/TensorRT & Triton
 
