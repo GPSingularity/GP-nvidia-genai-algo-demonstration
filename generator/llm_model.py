@@ -4,18 +4,27 @@ from typing import List, Optional
 
 class NeMoLLM:
     """
-    Wrapper around an NVIDIA NeMo Megatron GPT model for text generation.
+    Wrapper for an NVIDIA NeMo Megatron GPT model for text generation.
+
+    Defaults to a small NeMo checkpoint ("megatron_gpt_345m").
+    Use MegatronGPTModel.list_available_models() to see other options.
     """
     def __init__(
         self,
-        model_name: str = "gpt-j-6B",
+        model_name: str = "megatron_gpt_345m",
         device: Optional[str] = None,
     ):
         # Select device
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
-        # Load the pretrained NeMo Megatron GPT model
-        self.model: MegatronGPTModel = MegatronGPTModel.from_pretrained(model_name)
+        # Load pretrained Megatron GPT model
+        try:
+            self.model: MegatronGPTModel = MegatronGPTModel.from_pretrained(model_name)
+        except FileNotFoundError:
+            available = MegatronGPTModel.list_available_models()
+            raise FileNotFoundError(
+                f"Model '{model_name}' not found. Available: {available}"
+            )
         self.model.eval().to(self.device)
 
     def generate(
@@ -37,3 +46,29 @@ class NeMoLLM:
             top_k=top_k,
             top_p=top_p,
         )
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(
+        description="NeMo Megatron GPT generation demo"
+    )
+    parser.add_argument(
+        "--prompt", type=str, required=True, help="Input prompt for generation"
+    )
+    parser.add_argument(
+        "--model-name", type=str, default="megatron_gpt_345m",
+        help="NeMo model checkpoint name"
+    )
+    parser.add_argument(
+        "--max-length", type=int, default=256, help="Max generation tokens"
+    )
+    parser.add_argument(
+        "--temperature", type=float, default=1.0, help="Sampling temperature"
+    )
+    args = parser.parse_args()
+
+    nemo_llm = NeMoLLM(model_name=args.model_name)
+    result = nemo_llm.generate([
+        args.prompt
+    ], max_length=args.max_length, temperature=args.temperature)
+    print(f"\n=== Generated Text ===\n{result[0]}")
