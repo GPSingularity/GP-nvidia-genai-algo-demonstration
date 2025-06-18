@@ -10,30 +10,27 @@ The first wave of generative AI applications, including chatbots, offered valuab
 
 This repository demonstrates a full-stack Retrieval-Augmented Generation (RAG) pipeline built with NVIDIA AI infrastructure. PDFs are ingested and chunked locally via a Python virtual environment, indexed with FAISS, and served through a NeMo LLM wrapper. For high-performance inference, the model is exported to ONNX, converted into a TensorRT engine on an NVIDIA GPU A100 (using a cloud IDE or DGX Cloud), and deployed within Triton Inference Server (via Docker). An interactive Gradio UI ties the components together for easy experimentation and benchmarking.
 
-<pre lang="markdown">
 ## Architecture
 
 ```mermaid
 flowchart LR
   subgraph Retrieval
-    A[PDFs (data/)] --> B[chunker.py -> chunks.json]
-    B --> C[build_index.py -> FAISS index]
+    A["PDFs (data/)"] --> B["chunker.py -> chunks.json"]
+    B --> C["build_index.py -> FAISS index"]
   end
 
   subgraph Generation
-    C --> D[generator/llm_model.py]
-    D --> E[RAG answer]
-    E --> F[app.py (Gradio UI)]
+    C --> D["generator/llm_model.py"]
+    D --> E["RAG answer"]
+    E --> F["app.py (Gradio UI)"]
   end
 
   subgraph Inference
-    G[export_onnx.py -> onnx/model.onnx]
-    G --> H[build_trt_engine.py -> trt/model.plan]
-    H --> I[triton_models/rag/1/ + config.pbtxt]
-    I --> J[Triton Server]
+    G["export_onnx.py -> onnx/model.onnx"]
+    G --> H["build_trt_engine.py -> trt/model.plan"]
+    H --> I["triton_models/rag/1/ + config.pbtxt"]
+    I --> J["Triton Server"]
   end
-```
-</pre>
 
 
 ## Quickstart
