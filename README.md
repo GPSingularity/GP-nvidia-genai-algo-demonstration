@@ -140,17 +140,17 @@ docker run --gpus all --rm \
 
 ## References
 
-Facebook AI. (2019). *FAISS: A library for efficient similarity search*. Retrieved June 18, 2025, from [https://github.com/facebookresearch/faiss](https://github.com/facebookresearch/faiss)
+Facebook AI. (2019). *FAISS: A library for efficient similarity search*. Retrieved June 17, 2025, from [https://github.com/facebookresearch/faiss](https://github.com/facebookresearch/faiss)
 
-NVIDIA Corporation. (2020). *NVIDIA Ampere Architecture Whitepaper*. Retrieved June 18, 2025, from [https://www.nvidia.com/content/dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf](https://www.nvidia.com/content/dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf)
+NVIDIA Corporation. (2020). *NVIDIA Ampere Architecture Whitepaper*. Retrieved June 17, 2025, from [https://www.nvidia.com/content/dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf](https://www.nvidia.com/content/dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf)
 
-NVIDIA Corporation. (2024). *Triton Inference Server Documentation*. NVIDIA. Retrieved June 18, 2025, from [https://docs.nvidia.com/deeplearning/triton-inference-server/](https://docs.nvidia.com/deeplearning/triton-inference-server/)
+NVIDIA Corporation. (2024). *Triton Inference Server Documentation*. NVIDIA. Retrieved June 17, 2025, from [https://docs.nvidia.com/deeplearning/triton-inference-server/](https://docs.nvidia.com/deeplearning/triton-inference-server/)
 
 Reimers, N., & Gurevych, I. (2019). *Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks*. arXiv. Retrieved June 18, 2025, from [https://arxiv.org/abs/1908.10084](https://arxiv.org/abs/1908.10084)
 
-Saranová, I. (2023). *Advanced Evolutionary Image Filtering* [PDF]. CORE. Retrieved June 18, 2025, from [https://core.ac.uk/download/574570613.pdf](https://core.ac.uk/download/574570613.pdf)
+Saranová, I. (2023). *Advanced Evolutionary Image Filtering* [PDF]. CORE. Retrieved June 17, 2025, from [https://core.ac.uk/download/574570613.pdf](https://core.ac.uk/download/574570613.pdf)
 
-Wolf, T., Debut, L., Sanh, V., Chaumond, J., Delangue, C., Moi, A., Cistac, P., Rault, T., Louf, R., Funtowicz, M., & Brew, J. (2020). *Transformers: State-of-the-art natural language processing*. EMNLP: System Demonstrations. Retrieved June 18, 2025, from [https://doi.org/10.18653/v1/2020.emnlp-demos.6](https://doi.org/10.18653/v1/2020.emnlp-demos.6)
+Wolf, T., Debut, L., Sanh, V., Chaumond, J., Delangue, C., Moi, A., Cistac, P., Rault, T., Louf, R., Funtowicz, M., & Brew, J. (2020). *Transformers: State-of-the-art natural language processing*. EMNLP: System Demonstrations. Retrieved June 17, 2025, from [https://doi.org/10.18653/v1/2020.emnlp-demos.6](https://doi.org/10.18653/v1/2020.emnlp-demos.6)
 
 ## License
 
