@@ -2,10 +2,22 @@ from transformers import pipeline
 
 class NeMoLLM:
     """
+    Fallback generator using Hugging Face Transformers on CPU only.
+    Avoids MPS/GPU on macOS to prevent segfaults.
+    Named NeMoLLM so app.py need not change.
+    """
+    """
     Fallback generator using Hugging Face Transformers.
     Named NeMoLLM so app.py need not change.
     """
-    def __init__(self, model_name: str = "distilgpt2", device: int = -1):
+        def __init__(self, model_name: str = "distilgpt2"):
+        # Force CPU execution to avoid MPS instability
+        self.device = -1  # CPU
+        self.generator = pipeline(
+            "text-generation",
+            model=model_name,
+            device=self.device,
+        )
         # device=-1 for CPU/MPS, >=0 for GPU id
         self.generator = pipeline(
             "text-generation",
