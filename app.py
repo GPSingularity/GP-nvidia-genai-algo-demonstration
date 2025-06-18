@@ -1,65 +1,63 @@
-# macOS fork safety: use spawn to prevent segfaults
-import multiprocessing as mp
-mp.set_start_method('spawn', force=True)
-
-# Disable Objective-C fork safety on macOS (for libraries that fork)
+#!/usr/bin/env python3
 import os
-os.environ['OBJC_DISABLE_INITIALIZE_FORK_SAFETY'] = 'YES'
-
-
 import faiss
 import pickle
-from retriever.chunker import load_and_chunk  # if you want dynamic ingestion
-from retriever.build_index import build_faiss_index
+import torch
 from sentence_transformers import SentenceTransformer
 from generator.llm_model import NeMoLLM
 import gradio as gr
-import os
 
-# Paths
+# Configuration
 INDEX_PATH = "faiss.index"
 META_PATH = "chunks_meta.pkl"
 EMBED_MODEL = "all-MiniLM-L6-v2"
+
+# Ensure index and metadata exist
+if not os.path.exists(INDEX_PATH) or not os.path.exists(META_PATH):
+    raise FileNotFoundError(
+        "Index or metadata not found. Run retriever/chunker.py and retriever/build_index.py first."
+    )
 
 # Load FAISS index and metadata
 index = faiss.read_index(INDEX_PATH)
 with open(META_PATH, "rb") as f:
     chunks = pickle.load(f)
 
-# Embedding model (for queries)
-embedder = SentenceTransformer(EMBED_MODEL)
+# Select device for embeddings & model
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# NeMo LLM (uses default 'megatron_gpt_345m')
-nemo_llm = NeMoLLM()
+# Initialize embedding model on GPU if available
+embedder = SentenceTransformer(EMBED_MODEL, device=device)
 
-# RAG function
+# Initialize LLM wrapper (uses GPU)
+llm = NeMoLLM()
 
+# RAG inference function
 def rag_answer(query: str, top_k: int = 5, max_length: int = 256):
-    # Embed query
+    # Embed the query
     q_emb = embedder.encode([query]).astype("float32")
+    # Retrieve top_k chunks
     distances, indices = index.search(q_emb, top_k)
     retrieved = [chunks[i]["text"] for i in indices[0]]
+    # Build context and prompt
     context = "\n\n---\n\n".join(retrieved)
-    prompt = f"Answer the question based on the following context:\n{context}\n\nQ: {query}\nA:"
-
-    # Generate with NeMo
-    response = nemo_llm.generate([prompt], max_length=max_length)[0]
+    prompt = (
+        "Answer the question based on the following context:\n"
+        f"{context}\n\nQ: {query}\nA:"
+    )
+    # Generate response
+    response = llm.generate([prompt], max_length=max_length)[0]
     return response, retrieved
 
-# Gradio UI
-def launch_app():
-    with gr.Blocks() as demo:
-        gr.Markdown("# NVIDIA RAG Demo with NeMo & FAISS")
-        with gr.Row():
-            inp = gr.Textbox(lines=2, placeholder="Enter your question here...", label="Question")
-        out = gr.Textbox(lines=5, label="Answer")
-        src = gr.Dataframe(headers=["Retrieved Chunks"], datatype="str", label="Sources")
-        btn = gr.Button("Ask")
-        btn.click(fn=rag_answer, inputs=[inp], outputs=[out, src])
-    demo.launch()
+# Build the Gradio interface
+with gr.Blocks() as demo:
+    gr.Markdown("# NVIDIA RAG Demo on A100 (CUDA)")
+    with gr.Row():
+        inp = gr.Textbox(lines=2, placeholder="Enter your question here...", label="Question")
+    out = gr.Textbox(lines=5, label="Answer")
+    src = gr.Dataframe(headers=["Retrieved Chunks"], datatype="str", label="Sources")
+    btn = gr.Button("Ask")
+    btn.click(fn=rag_answer, inputs=[inp], outputs=[out, src])
 
-if __name__ == "__main__":
-    # Optionally, re-index if new PDFs added:
-    # if not os.path.exists(INDEX_PATH):
-    #     build_faiss_index()
-    launch_app()
+# Launch with host and port for container/VM
+demo.launch(server_name="0.0.0.0", server_port=7860)
