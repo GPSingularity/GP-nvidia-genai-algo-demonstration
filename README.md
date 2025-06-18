@@ -15,8 +15,8 @@ This repository demonstrates a full-stack Retrieval-Augmented Generation (RAG) p
 ```mermaid
 flowchart LR
   subgraph Retrieval
-    A[PDFs (data/)] --> B[chunker.py → chunks.json]
-    B --> C[build_index.py → FAISS index]
+    A[PDFs (data/)] --> B[chunker.py -> chunks.json]
+    B --> C[build_index.py -> FAISS index]
   end
 
   subgraph Generation
@@ -26,12 +26,11 @@ flowchart LR
   end
 
   subgraph Inference
-    G[export_onnx.py → onnx/model.onnx]
-    G --> H[build_trt_engine.py → trt/model.plan]
+    G[export_onnx.py -> onnx/model.onnx]
+    G --> H[build_trt_engine.py -> trt/model.plan]
     H --> I[triton_models/rag/1/ + config.pbtxt]
     I --> J[Triton Server]
   end
-```
 
 ## Quickstart
 
